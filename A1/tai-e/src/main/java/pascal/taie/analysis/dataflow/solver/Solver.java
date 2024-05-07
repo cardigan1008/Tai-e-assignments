@@ -80,8 +80,13 @@ public abstract class Solver<Node, Fact> {
         throw new UnsupportedOperationException();
     }
 
+    // For a backward analysis, in of exit bb should be set to empty first.
+    // Then, the in of each bb except exit should be set to empty.
+    // P.S. In fact, all ins of the bbs in the cfg should be set to empty.
     protected void initializeBackward(CFG<Node> cfg, DataflowResult<Node, Fact> result) {
-        // TODO - finish me
+        for (Node node: cfg.getNodes()) {
+            cfg.getInEdgesOf(node).clear();
+        }
     }
 
     /**
