@@ -82,13 +82,19 @@ public class LiveVariableAnalysis extends
                     }
                 }
                 // in = use U (out - def).
-                out.remove((Var) def);
-                use.union(out);
-                in = use;
+                SetFact<Var> newIn = new SetFact<>();
+                newIn.union(out);
+                newIn.remove((Var) def);
+                newIn.union(use);
 
+                // Return true when in changes!
+                if (in.equals(newIn)) {
+                    return false;
+                }
+                
+                in.set(newIn);
                 return true;
             }
-            return false;
         }
         return false;
     }

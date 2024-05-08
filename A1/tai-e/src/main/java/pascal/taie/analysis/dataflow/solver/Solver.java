@@ -84,8 +84,23 @@ public abstract class Solver<Node, Fact> {
     // Then, the in of each bb except exit should be set to empty.
     // P.S. In fact, all ins of the bbs in the cfg should be set to empty.
     protected void initializeBackward(CFG<Node> cfg, DataflowResult<Node, Fact> result) {
-        for (Node node: cfg.getNodes()) {
-            cfg.getInEdgesOf(node).clear();
+        // // Don't forget to use DataFlowResult!
+        // for (Node node: cfg.getNodes()) {
+        //     cfg.getInEdgesOf(node).clear(); // We should set nodes instead of edges!
+        // }
+        // // It's not null, instead, it's empty fact set.
+        // for (Node node: cfg.getNodes()) {
+        //     result.setInFact(node, null);
+        // }
+
+        result.setInFact(cfg.getExit(), analysis.newBoundaryFact(cfg));
+
+        for (Node node: cfg) {
+            if (!cfg.isExit(node)) {
+                result.setInFact(node, analysis.newInitialFact());
+                // target in meetinto maybe null, since we haven't set out!
+                result.setOutFact(node, analysis.newInitialFact());
+            }
         }
     }
 

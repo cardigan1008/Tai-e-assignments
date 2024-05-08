@@ -39,26 +39,18 @@ class IterativeSolver<Node, Fact> extends Solver<Node, Fact> {
 
     @Override
     protected void doSolveBackward(CFG<Node> cfg, DataflowResult<Node, Fact> result) {
-        int count = 0;
-
-        // We use count to indicate whether anything changes in In, since
-        // if nothing changes then count ++, which means when count == nodes.numm,
-        // nothing changes!
-        while (count != cfg.getNumberOfNodes()) {
-            for (Node node: cfg.getNodes()) {
-                boolean change = false;
-                for (Node preds: cfg.getPredsOf(node)) {
-                    analysis.meetInto(result.getInFact(preds), result.getOutFact(node));
+        boolean change = true;
+        while (change) {
+            change = false;
+            for (Node node: cfg) {
+                if (cfg.isExit(node)) continue;
+                for (Node succ: cfg.getSuccsOf(node)) {
+                    analysis.meetInto(result.getInFact(succ), result.getOutFact(node));
                     if (analysis.transferNode(node, result.getInFact(node), result.getOutFact(node))) {
                         change = true;
                     }
                 }
-                // If in dosen't change, count ++.
-                if (!change) {
-                    count ++;
-                }
             }
-            count = 0;
         }
     }
 }
